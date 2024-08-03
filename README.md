@@ -1,7 +1,10 @@
+Autoscan, [A-Train](https://github.com/m-rots/a-train) and [Bernard](https://github.com/m-rots/bernard-rs) are no longer actively maintained. All projects are considered feature frozen and when compatibility with Google Drive, Plex, Emby, Jellyfin and the -arrs inevitably breaks, no fixes will be provided and such an event will officially mark these projects as end of life.
+As all three projects have permissible open source licenses, feel free to start a fork and continue development. Ownership of these repositories as well as the Docker images will not be transferred.
+
 # Autoscan
 
 Autoscan replaces the default Plex and Emby behaviour for picking up file changes on the file system.
-Autoscan integrates with Sonarr, Radarr, Lidarr and Google Drive to fetch changes in near real-time without relying on the file system.
+Autoscan integrates with Sonarr, Radarr, Readarr, Lidarr and Google Drive to fetch changes in near real-time without relying on the file system.
 
 Wait, what happened to [Plex Autoscan](https://github.com/l3uddz/plex_autoscan)?
 Well, Autoscan is a rewrite of the original Plex Autoscan written in the Go language.
@@ -61,7 +64,7 @@ It is important that all three modules can have access to a file. When a trigger
 
 #### Simple example
 
-- Sonarr running in a Docker container (same example works for Lidarr and Radarr)
+- Sonarr running in a Docker container (same example works for Lidarr, Radarr and Readarr)
 - Autoscan running on the host OS (not in a container)
 - Plex running in a Docker container
 
@@ -117,8 +120,8 @@ Autoscan currently supports the following triggers:
 
 - Manual: When you want to scan a path manually.
 
-- The -arrs: Lidarr, Sonarr and Radarr. \
-  Webhook support for Lidarr, Sonarrr and Radarr.
+- The -arrs: Lidarr, Sonarr, Radarr and Readarr. \
+  Webhook support for Lidarr, Sonarr, Radarr and Readarr.
 
 All triggers support:
 
@@ -142,7 +145,7 @@ triggers:
       - from: ^/Media/
         to: /mnt/unionfs/Media/
     # Drives only need to be given when Drive-specific rewrites are used
-    drives: 
+    drives:
       - id: 0A1xxxxxxxxxUk9PVA # The ID of Shared Drive #1
         rewrite: # Drive-specific rewrite (has priority over global rewrite)
           - from: ^/TV/
@@ -180,13 +183,14 @@ The following -arrs are currently provided by Autoscan:
 
 - Lidarr
 - Radarr
+- Readarr
 - Sonarr
 
 #### Connecting the -arrs
 
-To add your webhook to Sonarr, Radarr or Lidarr, do:
+To add your webhook to Sonarr, Radarr, Readarr or Lidarr, do:
 
-1. Open the `settings` page in Sonarr/Radarr/Lidarr
+1. Open the `settings` page in Sonarr/Radarr/Readarr/Lidarr
 2. Select the tab `connect`
 3. Click on the big plus sign
 4. Select `webhook`
@@ -233,7 +237,7 @@ triggers:
       - from: ^/Media/
         to: /mnt/unionfs/Media/
     # Drives only need to be given when Drive-specific rewrites are used
-    drives: 
+    drives:
       - id: 0A1xxxxxxxxxUk9PVA # The ID of Shared Drive #1
         rewrite: # Drive-specific rewrite (has priority over global rewrite)
           - from: ^/TV/
@@ -266,6 +270,10 @@ triggers:
       priority: 2
     - name: radarr4k # /triggers/radarr4k
       priority: 5
+
+  readarr:
+    - name: readarr  # /triggers/readarr
+      priority: 1
 
   sonarr:
     - name: sonarr-docker # /triggers/sonarr-docker
@@ -478,6 +486,10 @@ triggers:
     - name: radarr4k # /triggers/radarr4k
       priority: 5
 
+  readarr:
+    - name: readarr  # /triggers/readarr
+      priority: 1
+
   sonarr:
     - name: sonarr-docker # /triggers/sonarr-docker
       priority: 2
@@ -505,6 +517,24 @@ targets:
         - from: /mnt/unionfs/Media/ # local file system
           to: /data/ # path accessible by the Emby docker container (if applicable)
 ```
+
+## Other configuration options
+
+```yaml
+# Specify the port to listen on (3030 is the default when not specified)
+port: 3030
+```
+
+```yaml
+# Specify the host interface(s) to listen on (0.0.0.0 is the default when not specified)
+host:
+  - 127.0.0.1
+  - 172.19.185.13
+  - 192.168.0.1:5959
+```
+
+- If no port is specified, it will use the default port configured.
+- This configuration option is only needed if you have a requirement to listen to multiple interfaces.
 
 ## Other installation options
 
